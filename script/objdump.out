@@ -1,0 +1,35 @@
+  42f4c8:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  42f69d:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  43a6de:	f2 0f 58 45 a0       	addsd  xmm0,QWORD PTR [rbp-0x60]
+  4428a8:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  465036:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46519e:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46ca4e:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46cf8c:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46d147:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46d16c:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46d1f9:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46d21e:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46d2e6:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46d3fd:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46d42e:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46d487:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46d6ff:	f2 0f 58 85 f8 5b ff 	addsd  xmm0,QWORD PTR [rbp-0xa408]
+  46d744:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46d7bd:	f2 0f 58 85 f8 5b ff 	addsd  xmm0,QWORD PTR [rbp-0xa408]
+  46d802:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46d9a7:	f2 0f 58 85 68 5c ff 	addsd  xmm0,QWORD PTR [rbp-0xa398]
+  46da64:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  46dcd6:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  4702e4:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  4703d5:	f2 0f 58 45 80       	addsd  xmm0,QWORD PTR [rbp-0x80]
+  4703e4:	f2 0f 58 45 e8       	addsd  xmm0,QWORD PTR [rbp-0x18]
+  4707d4:	f2 0f 58 c0          	addsd  xmm0,xmm0
+  4707e1:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  470827:	f2 0f 58 c0          	addsd  xmm0,xmm0
+  470834:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  47678e:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  476877:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  4769b7:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  476a18:	f2 0f 58 c1          	addsd  xmm0,xmm1
+  476a41:	f2 0f 58 45 e8       	addsd  xmm0,QWORD PTR [rbp-0x18]

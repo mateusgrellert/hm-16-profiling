@@ -41,6 +41,7 @@
 #include <string>
 #include <limits>
 #include "TLibCommon/TComRom.h"
+#include "TLibCommon/TComCycleMonitor.h"
 #include "TAppEncCfg.h"
 #include "TAppCommon/program_options_lite.h"
 #include "TLibEncoder/TEncRateCtrl.h"
@@ -1044,7 +1045,9 @@ Bool TAppEncCfg::parseCfg( Int argc, Char* argv[] )
     po::doHelp(cout, opts);
     return false;
   }
-
+#if EN_CYCLE_MONITOR
+  TComCycleMonitor::init(m_fQP);
+#endif
   /*
    * Set any derived parameters
    */

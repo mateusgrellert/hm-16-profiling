@@ -94,9 +94,7 @@ int main(int argc, char* argv[])
   // starting time
   Double dResult;
   clock_t lBefore = clock();
-#if EN_CYCLE_MONITOR
-  TComCycleMonitor::init();
-#endif
+
   // call encoding function
   cTAppEncTop.encode();
 

@@ -486,7 +486,7 @@ Distortion TComRdCost::getDistPart( Int bitDepth, Pel* piCur, Int iCurStride,  P
   cDtParam.compIdx      = MAX_NUM_COMPONENT; // just for assert: to be sure it was set before use
   cDtParam.bitDepth     = bitDepth;
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
-    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc);
+    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc, TComCycleMonitor::currDepth);
 #endif
   if (isChroma(compID))
   {

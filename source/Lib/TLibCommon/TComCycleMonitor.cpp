@@ -17,22 +17,25 @@ vector<dictionary> TComCycleMonitor::cycleVector;
 ofstream TComCycleMonitor::cycleResults;
 uint TComCycleMonitor::currFrame;
 struct timeval TComCycleMonitor::timer;
+struct timespec TComCycleMonitor::ts_start;
+struct timespec TComCycleMonitor::ts_end;
 std::string TComCycleMonitor::currDistFunc;
 bool TComCycleMonitor::isIntra;
 bool TComCycleMonitor::isMerge;
 bool TComCycleMonitor::isOthers;
-
+uint TComCycleMonitor::currDepth;
 
 TComCycleMonitor::TComCycleMonitor() {
 
 }
 
 
-void TComCycleMonitor::init(){
+void TComCycleMonitor::init(double qp){
     if(not(cycleResults.is_open())){        
-     
         
-        cycleResults.open("function_cycle_results.csv", ofstream::out);
+        ostringstream file_path;
+        file_path << "function_cycle_results_" << (int) qp << ".csv";
+        cycleResults.open(file_path.str().c_str(), ofstream::out);
         
         cycleResults << "\t Total Time (s)\tCalls (kCalls)"<< endl;
 
@@ -40,6 +43,7 @@ void TComCycleMonitor::init(){
     isIntra = false;
     isMerge = false;
     isOthers = true;
+    currDepth = 0;
     currDistFunc = "Null";
     cycleVector.clear();
 }
@@ -53,42 +57,74 @@ dictionary TComCycleMonitor::createTriplet(string func){
     return triplet;
 }
 
-void TComCycleMonitor::setInitCycle(string func){
+void TComCycleMonitor::setCurrDepth(uint d){
+    currDepth = d;
+}
+
+void TComCycleMonitor::setInitCycle(string f, uint d){
+    ostringstream sstr;
+    sstr << f << "_" << d;
+    std::string func = sstr.str();
+    
+   // currDepth = d;
     if(func != "Others" and isOthers == true){
         isOthers = false;
         setEndCycle("Others");
     }
     
-    vector<dictionary>::iterator it;
-    gettimeofday(&timer,NULL);
+
     
+    vector<dictionary>::iterator it;
+#if USE_RDTSC
+    unsigned long long begin = rdtsc();
+#else
+    gettimeofday(&timer,NULL);
+#endif
      // tries to find the function in the vector, if not, create node
     for(it = cycleVector.begin(); it != cycleVector.end(); it++){
         if (it->first == func){
+            
+#if USE_RDTSC
+            it->second[0] = begin/CPU_TICKS_PER_SECOND;
+#else
             it->second[0] = timer.tv_sec +  timer.tv_usec*1.0/1000000;
-
+#endif
             break;
         }
     }
     if(it == cycleVector.end()){
         dictionary triplet = createTriplet(func);
+#if USE_RDTSC
+        triplet.second[0] = begin/CPU_TICKS_PER_SECOND;
+#else       
         triplet.second[0] = timer.tv_sec +  timer.tv_usec*1.0/1000000;
+#endif
         
         cycleVector.push_back(triplet);
     }
 }
 
-void TComCycleMonitor::setEndCycle(string func){
+void TComCycleMonitor::setEndCycle(string f){
+    ostringstream sstr;
+    sstr << f << "_" << currDepth;
+    std::string func = sstr.str();
+    
     vector<dictionary>::iterator it;
     double diff_time;
-
+#if USE_RDTSC
+    unsigned long long end = rdtsc();
+#else
     gettimeofday(&timer,NULL);
-
+#endif
     for(it = cycleVector.begin(); it != cycleVector.end(); it++){
         if (it->first == func){
+#if USE_RDTSC
+            double end_time = end/CPU_TICKS_PER_SECOND;
+#else
             double end_time = timer.tv_sec +  timer.tv_usec*1.0/1000000;
+#endif
             diff_time = end_time - it->second[0];
-            //assert(diff_time != 0);
+            assert(diff_time != 0);
             it->second[2]++;
             it->second[1] += diff_time;
             break;
@@ -97,7 +133,7 @@ void TComCycleMonitor::setEndCycle(string func){
         
     if(func != "Others" and isOthers == false){
         isOthers = true;
-        setInitCycle("Others");
+        setInitCycle("Others", currDepth);
     }
 
 }
@@ -116,7 +152,7 @@ void TComCycleMonitor::setDistFuncString(int w, int h, int func_enum){
     else
         distFunc = "Null";
     
-    stringst << "Dist_" << distFunc << "_" << w << "x" << h;
+    stringst << "DIST_" << distFunc << "_" << w << "x" << h;
     currDistFunc = stringst.str();
 }
 

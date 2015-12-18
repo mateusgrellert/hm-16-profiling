@@ -379,7 +379,7 @@ __inline Void TEncSearch::xTZSearchHelp( TComPattern* pcPatternKey, IntTZSearchS
     else
       m_cDistParam.iSubShift = 1;
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
-    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc);
+    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc, TComCycleMonitor::currDepth);
 #endif
     Distortion uiTempSad = m_cDistParam.DistFunc( &m_cDistParam );
     
@@ -396,7 +396,7 @@ __inline Void TEncSearch::xTZSearchHelp( TComPattern* pcPatternKey, IntTZSearchS
         m_cDistParam.pCur = piRefSrch + (rcStruct.iYStride << isubShift);
         
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
-    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc);
+    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc, TComCycleMonitor::currDepth);
 #endif
         uiTempSad = m_cDistParam.DistFunc( &m_cDistParam );
         
@@ -429,7 +429,7 @@ __inline Void TEncSearch::xTZSearchHelp( TComPattern* pcPatternKey, IntTZSearchS
   {
       
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
-    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc);
+    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc, TComCycleMonitor::currDepth);
 #endif
     uiSad = m_cDistParam.DistFunc( &m_cDistParam );
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
@@ -865,7 +865,7 @@ Distortion TEncSearch::xPatternRefinement( TComPattern* pcPatternKey,
     m_cDistParam.bitDepth = g_bitDepth[CHANNEL_TYPE_LUMA];
     
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
-    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc);
+    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc,TComCycleMonitor::currDepth);
 #endif
     uiDist = m_cDistParam.DistFunc( &m_cDistParam );
     
@@ -1392,6 +1392,7 @@ Void TEncSearch::xIntraCodingTUBlock(       TComYuv*    pcOrgYuv,
   }
 
   //===== update distortion =====
+  TComCycleMonitor::setCurrDepth(rTu.getCUDepth());
   ruiDist += m_pcRdCost->getDistPart( g_bitDepth[chType], piReco, uiStride, piOrg, uiStride, uiWidth, uiHeight, compID );
 }
 
@@ -2311,7 +2312,7 @@ TEncSearch::preestChromaPredMode( TComDataCU* pcCU,
         //--- get SAD ---
       
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING 
-    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc);
+    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc, pcCU->getDepth(0));
 #endif
         Distortion uiSAD  = distParamU.DistFunc(&distParamU);
         uiSAD            += distParamV.DistFunc(&distParamV);
@@ -2449,7 +2450,7 @@ TEncSearch::estIntraPredQT(TComDataCU* pcCU,
         // use hadamard transform here
      
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
-    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc);
+    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc, pcCU->getDepth(0));
 #endif
         uiSad+=distParam.DistFunc(&distParam);
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
@@ -3030,7 +3031,7 @@ Void TEncSearch::xGetInterPredictionError( TComDataCU* pcCU, TComYuv* pcYuvOrg, 
                             m_tmpYuvPred .getAddr( COMPONENT_Y, uiAbsPartIdx ), m_tmpYuvPred.getStride(COMPONENT_Y),
                             iWidth, iHeight, m_pcEncCfg->getUseHADME() && (pcCU->getCUTransquantBypass(iPartIdx) == 0) );
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
-    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc);
+    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc, TComCycleMonitor::currDepth);
 #endif
   ruiErr = cDistParam.DistFunc( &cDistParam );
   #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
@@ -3894,6 +3895,7 @@ Distortion TEncSearch::xGetTemplateCost( TComDataCU* pcCU,
   }
 
   // calc distortion
+  TComCycleMonitor::setCurrDepth(pcCU->getDepth(uiPartIdx));
 
   uiCost = m_pcRdCost->getDistPart( g_bitDepth[CHANNEL_TYPE_LUMA], pcTemplateCand->getAddr(COMPONENT_Y, uiPartAddr), pcTemplateCand->getStride(COMPONENT_Y), pcOrgYuv->getAddr(COMPONENT_Y, uiPartAddr), pcOrgYuv->getStride(COMPONENT_Y), iSizeX, iSizeY, COMPONENT_Y, DF_SAD );
   uiCost = (UInt) m_pcRdCost->calcRdCost( m_auiMVPIdxCost[iMVPIdx][iMVPNum], uiCost, false, DF_SAD );
@@ -3925,7 +3927,6 @@ Void TEncSearch::xMotionEstimation( TComDataCU* pcCU, TComYuv* pcYuvOrg, Int iPa
   Double        fWeight       = 1.0;
 
   pcCU->getPartIndexAndSize( iPartIdx, uiPartAddr, iRoiWidth, iRoiHeight );
-
   if ( bBi )
   {
     TComYuv*  pcYuvOther = &m_acYuvPred[1-(Int)eRefPicList];
@@ -4076,7 +4077,7 @@ Void TEncSearch::xPatternSearch( TComPattern* pcPatternKey, Pel* piRefY, Int iRe
       m_cDistParam.bitDepth = g_bitDepth[CHANNEL_TYPE_LUMA];
       
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
-    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc);
+    TComCycleMonitor::setInitCycle(TComCycleMonitor::currDistFunc, TComCycleMonitor::currDepth);
 #endif
       uiSad = m_cDistParam.DistFunc( &m_cDistParam );
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
@@ -4526,7 +4527,7 @@ Void TEncSearch::xPatternSearchFracDIF(
 
   ostringstream sstr;
   sstr << "INTERPOL_HALF_" << pcPatternKey->getROIYWidth() << "x" << pcPatternKey->getROIYHeight();
-  TComCycleMonitor::setInitCycle(sstr.str());
+  TComCycleMonitor::setInitCycle(sstr.str(), TComCycleMonitor::currDepth);
 
 #endif
   xExtDIFUpSamplingH ( &cPatternRoi, biPred );
@@ -4561,7 +4562,7 @@ Void TEncSearch::xPatternSearchFracDIF(
 #if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
   sstr.str(std::string());
   sstr << "INTERPOL_QUARTER_" << pcPatternKey->getROIYWidth() << "x" << pcPatternKey->getROIYHeight();
-  TComCycleMonitor::setInitCycle(sstr.str());
+  TComCycleMonitor::setInitCycle(sstr.str(), TComCycleMonitor::currDepth);
 
 #endif
   
@@ -4633,6 +4634,9 @@ Void TEncSearch::encodeResAndCalcRdInterCU( TComDataCU* pcCU, TComYuv* pcYuvOrg,
       const ComponentID compID=ComponentID(ch);
       const UInt csx=pcYuvOrg->getComponentScaleX(compID);
       const UInt csy=pcYuvOrg->getComponentScaleY(compID);
+        
+      TComCycleMonitor::setCurrDepth(pcCU->getDepth(0));
+
       uiDistortion += m_pcRdCost->getDistPart( g_bitDepth[toChannelType(compID)], pcYuvRec->getAddr(compID), pcYuvRec->getStride(compID), pcYuvOrg->getAddr(compID),
                                                pcYuvOrg->getStride(compID), uiWidth >> csx, uiHeight >> csy, compID);
     }
@@ -4829,6 +4833,9 @@ Void TEncSearch::encodeResAndCalcRdInterCU( TComDataCU* pcCU, TComYuv* pcYuvOrg,
   for(UInt ch=0; ch<pcYuvRec->getNumberValidComponents(); ch++)
   {
     const ComponentID compID=ComponentID(ch);
+          
+    TComCycleMonitor::setCurrDepth(pcCU->getDepth(0));
+
     uiDistortionBest += m_pcRdCost->getDistPart( g_bitDepth[toChannelType(compID)], pcYuvRec->getAddr(compID ), pcYuvRec->getStride(compID ), pcYuvOrg->getAddr(compID ), pcYuvOrg->getStride(compID), uiWidth >> pcYuvOrg->getComponentScaleX(compID), uiHeight >> pcYuvOrg->getComponentScaleY(compID), compID);
   }
   dCostBest = m_pcRdCost->calcRdCost( uiBitsBest, uiDistortionBest );
@@ -5085,6 +5092,8 @@ Void TEncSearch::xEstimateResidualQT( TComYuv    *pcResi,
                                                         tuCompRect.width,
                                                         m_pcQTTempTComYuv[uiQTTempAccessLayer].getStride(compID),
                                                         true);
+                    
+                  TComCycleMonitor::setCurrDepth(pcCU->getDepth(uiAbsPartIdx));
 
                   nonCoeffDist = m_pcRdCost->getDistPart( g_bitDepth[toChannelType(compID)], m_pcQTTempTComYuv[uiQTTempAccessLayer].getAddrPix( compID, tuCompRect.x0, tuCompRect.y0 ),
                                                                                               m_pcQTTempTComYuv[uiQTTempAccessLayer].getStride( compID ), pcResi->getAddrPix( compID, tuCompRect.x0, tuCompRect.y0 ),
@@ -5092,6 +5101,9 @@ Void TEncSearch::xEstimateResidualQT( TComYuv    *pcResi,
                 }
                 else
                 {
+                                      
+                    TComCycleMonitor::setCurrDepth(pcCU->getDepth(uiAbsPartIdx));
+
                   nonCoeffDist = m_pcRdCost->getDistPart( g_bitDepth[toChannelType(compID)], m_pTempPel, tuCompRect.width, pcResi->getAddrPix( compID, tuCompRect.x0, tuCompRect.y0 ),
                                                                                               pcResi->getStride(compID), tuCompRect.width, tuCompRect.height, compID); // initialized with zero residual destortion
                 }
@@ -5152,6 +5164,7 @@ Void TEncSearch::xEstimateResidualQT( TComYuv    *pcResi,
                                                         m_pcQTTempTComYuv[uiQTTempAccessLayer].getStride(compID     ),
                                                         true);
                 }
+                  TComCycleMonitor::setCurrDepth(pcCU->getDepth(uiAbsPartIdx));
 
                 currCompDist = m_pcRdCost->getDistPart( g_bitDepth[toChannelType(compID)], m_pcQTTempTComYuv[uiQTTempAccessLayer].getAddrPix( compID, tuCompRect.x0, tuCompRect.y0 ),
                                                         m_pcQTTempTComYuv[uiQTTempAccessLayer].getStride(compID),

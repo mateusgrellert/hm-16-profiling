@@ -377,6 +377,11 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
 Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt uiDepth )
 #endif
 {
+    
+#if EN_CYCLE_MONITOR
+    TComCycleMonitor::setCurrDepth(uiDepth);
+#endif
+    
   TComPic* pcPic = rpcBestCU->getPic();
   DEBUG_STRING_NEW(sDebug)
 
@@ -1330,6 +1335,7 @@ Void TEncCu::xCheckRDCostInter( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, 
   DEBUG_STRING_NEW(sTest)
 
   UChar uhDepth = rpcTempCU->getDepth( 0 );
+ TComCycleMonitor::setCurrDepth(uhDepth);
 
   rpcTempCU->setDepthSubParts( uhDepth, 0 );
 

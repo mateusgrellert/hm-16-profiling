@@ -20,9 +20,10 @@ def which(program):
     return None
 
 for exe in os.listdir(sys.argv[1]):
-	exe = sys.argv[1] + '/' + exe
+	exe = sys.argv[1] + exe
 	asm = 'addpd\|addsd\|paddq'
 	cmd_line = "objdump -M intel -d %s | grep -w '%s' > objdump.out" % (exe,asm)
 	if os.path.isfile(exe) and os.access(exe, os.X_OK):
 		os.system(cmd_line)
-	
+		if len(open('objdump.out','r').readlines()) > 1:
+			print exe, ' contains intel SSE/MMX'

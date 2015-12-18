@@ -1133,7 +1133,7 @@ Void TEncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, TComList<TComPic*>& rc
       pcSlice->setSliceCurStartCtuTsAddr( 0 );
       pcSlice->setSliceSegmentCurStartCtuTsAddr( 0 );
 #if EN_CYCLE_MONITOR 
-  TComCycleMonitor::setInitCycle("Others");
+  TComCycleMonitor::setInitCycle("Others",0);
 
 #endif
       for(UInt nextCtuTsAddr = 0; nextCtuTsAddr < numberOfCtusInFrame; )

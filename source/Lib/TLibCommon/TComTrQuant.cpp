@@ -853,7 +853,7 @@ Void xTrMxN(Int bitDepth, TCoeff *block, TCoeff *coeff, Int iWidth, Int iHeight,
       stringstr << "TR_DCT_";
   stringstr << iWidth << "x" << iHeight;
   
-  TComCycleMonitor::setInitCycle(stringstr.str());
+  TComCycleMonitor::setInitCycle(stringstr.str(), TComCycleMonitor::currDepth);
       
 #endif
   switch (iWidth)
@@ -931,7 +931,7 @@ Void xITrMxN(Int bitDepth, TCoeff *coeff, TCoeff *block, Int iWidth, Int iHeight
       stringstr << "TR_iDCT_";
   stringstr << iWidth << "x" << iHeight;
   
-  TComCycleMonitor::setInitCycle(stringstr.str());
+  TComCycleMonitor::setInitCycle(stringstr.str(), TComCycleMonitor::currDepth);
       
 #endif
   switch (iHeight)
@@ -1431,6 +1431,7 @@ Void TComTrQuant::transformNxN(       TComTU        & rTu,
       }
       else
       {
+          TComCycleMonitor::setCurrDepth(rTu.getCUDepth());
         xT( compID, rTu.useDST(compID), pcResidual, uiStride, m_plTempCoeff, uiWidth, uiHeight );
       }
 #if EN_CYCLE_MONITOR && !FUNCTION_LEVEL_MONITORING
@@ -1497,6 +1498,8 @@ Void TComTrQuant::invTransformNxN(      TComTU        &rTu,
 
       Pel    *subTUResidual     = pcResidual + (lineOffset * uiStride);
       TCoeff *subTUCoefficients = pcCoeff     + (lineOffset * subTURecurse.getRect(compID).width);
+                 
+      TComCycleMonitor::setCurrDepth(rTu.getCUDepth());
 
       invTransformNxN(subTURecurse, compID, subTUResidual, uiStride, subTUCoefficients, cQP DEBUG_STRING_PASS_INTO(psDebug));
 
