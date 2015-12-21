@@ -45,8 +45,8 @@ else:
 
 
 pathToRefBin = '../bin/TAppEncoderStatic'
-pathToCsv = '../bin/function_cycle_results'
-optParamsRef = ''
+pathToCsv = 'function_cycle_results'
+optParamsRef = [' --MaxPartitionDepth=4',' --MaxPartitionDepth=3', ' --MaxPartitionDepth=2', ' --MaxPartitionDepth=1']
 
 
 RUN_PARALLEL = False

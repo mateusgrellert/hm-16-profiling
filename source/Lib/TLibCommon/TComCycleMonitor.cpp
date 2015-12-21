@@ -15,7 +15,7 @@ using namespace std;
 
 vector<dictionary> TComCycleMonitor::cycleVector;
 ofstream TComCycleMonitor::cycleResults;
-uint TComCycleMonitor::currFrame;
+//uint TComCycleMonitor::currFrame;
 struct timeval TComCycleMonitor::timer;
 struct timespec TComCycleMonitor::ts_start;
 struct timespec TComCycleMonitor::ts_end;
@@ -62,31 +62,38 @@ void TComCycleMonitor::setCurrDepth(uint d){
 }
 
 void TComCycleMonitor::setInitCycle(string f, uint d){
-    ostringstream sstr;
-    sstr << f << "_" << d;
-    std::string func = sstr.str();
-    
+    std::string func;
+    if (f[0] == 'T' and f[1] == 'R'){
+        ostringstream sstr;
+        sstr << f << "_" << d;
+        func = sstr.str();
+    }
+    else
+        func = f;
    // currDepth = d;
     if(func != "Others" and isOthers == true){
         isOthers = false;
         setEndCycle("Others");
     }
     
-
+    unsigned long long begin;
     
     vector<dictionary>::iterator it;
-#if USE_RDTSC
-    unsigned long long begin = rdtsc();
-#else
-    gettimeofday(&timer,NULL);
-#endif
+//#if USE_RDTSC 
+//    unsigned long long begin = rdtsc();
+//#else
+//    gettimeofday(&timer,NULL);
+//#endif
      // tries to find the function in the vector, if not, create node
     for(it = cycleVector.begin(); it != cycleVector.end(); it++){
         if (it->first == func){
             
 #if USE_RDTSC
+            begin = rdtsc();
+
             it->second[0] = begin/CPU_TICKS_PER_SECOND;
 #else
+            gettimeofday(&timer,NULL);
             it->second[0] = timer.tv_sec +  timer.tv_usec*1.0/1000000;
 #endif
             break;
@@ -95,6 +102,8 @@ void TComCycleMonitor::setInitCycle(string f, uint d){
     if(it == cycleVector.end()){
         dictionary triplet = createTriplet(func);
 #if USE_RDTSC
+        begin = rdtsc();
+
         triplet.second[0] = begin/CPU_TICKS_PER_SECOND;
 #else       
         triplet.second[0] = timer.tv_sec +  timer.tv_usec*1.0/1000000;
@@ -105,17 +114,25 @@ void TComCycleMonitor::setInitCycle(string f, uint d){
 }
 
 void TComCycleMonitor::setEndCycle(string f){
-    ostringstream sstr;
-    sstr << f << "_" << currDepth;
-    std::string func = sstr.str();
     
-    vector<dictionary>::iterator it;
-    double diff_time;
 #if USE_RDTSC
     unsigned long long end = rdtsc();
 #else
     gettimeofday(&timer,NULL);
 #endif
+    
+    std::string func;
+
+    if (f[0] == 'T' and f[1] == 'R'){
+        ostringstream sstr;
+        sstr << f << "_" << currDepth;
+        func = sstr.str();
+    }
+    else
+        func = f;
+    vector<dictionary>::iterator it;
+    double diff_time;
+
     for(it = cycleVector.begin(); it != cycleVector.end(); it++){
         if (it->first == func){
 #if USE_RDTSC

@@ -20,6 +20,7 @@
 #include <vector>
 #include <string>
 
+typedef unsigned int uint;
 
 using namespace std;
 
@@ -29,7 +30,7 @@ class TComCycleMonitor {
 public:
     static vector<dictionary> cycleVector;
     static ofstream cycleResults;
-    static uint currFrame;
+   // static uint currFrame;
     static struct timespec begints;
 
     static struct timeval timer;

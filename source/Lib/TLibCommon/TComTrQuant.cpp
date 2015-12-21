@@ -1431,7 +1431,10 @@ Void TComTrQuant::transformNxN(       TComTU        & rTu,
       }
       else
       {
+#if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING
           TComCycleMonitor::setCurrDepth(rTu.getCUDepth());
+#endif
+          
         xT( compID, rTu.useDST(compID), pcResidual, uiStride, m_plTempCoeff, uiWidth, uiHeight );
       }
 #if EN_CYCLE_MONITOR && !FUNCTION_LEVEL_MONITORING
@@ -1498,9 +1501,10 @@ Void TComTrQuant::invTransformNxN(      TComTU        &rTu,
 
       Pel    *subTUResidual     = pcResidual + (lineOffset * uiStride);
       TCoeff *subTUCoefficients = pcCoeff     + (lineOffset * subTURecurse.getRect(compID).width);
-                 
+      
+#if EN_CYCLE_MONITOR && FUNCTION_LEVEL_MONITORING      
       TComCycleMonitor::setCurrDepth(rTu.getCUDepth());
-
+#endif
       invTransformNxN(subTURecurse, compID, subTUResidual, uiStride, subTUCoefficients, cQP DEBUG_STRING_PASS_INTO(psDebug));
 
       //------------------
